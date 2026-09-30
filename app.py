@@ -5,315 +5,359 @@ import plotly.express as px
 import plotly.graph_objects as go
 import joblib
 
-# 1. Конфигурация страницы
+# ---------------------------------------------------------
+# 1. Настройки страницы
+# ---------------------------------------------------------
 st.set_page_config(
-    page_title="BioGuard AI — Мониторинг биокоррозии",
-    page_icon="🛡️",
+    page_title="BioGuard AI — Экологический мониторинг биокоррозии",
+    page_icon="🌱",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 2. Премиальный Dark/Cyber-Tech CSS
+# ---------------------------------------------------------
+# 2. Стиль лендинга по образцу (Светло-зеленый эко-пром)
+# ---------------------------------------------------------
 st.markdown("""
 <style>
-    /* Импорт футуристичного шрифта */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Фон приложения */
     .stApp {
-        background: #090d16;
-        color: #e2e8f0;
+        background-color: #f8fafc;
+        color: #0f172a;
     }
-    
-    /* Скрытие стандартных елементов streamlit */
+
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Исправление текста и слайдеров */
-    .stSlider label, .stNumberInput label, .stSelectbox label, p, span, div {
-        color: #cbd5e1 !important;
-        font-weight: 500 !important;
-    }
-    
-    /* Главный неоновый баннер */
-    .hero-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #064e3b 100%);
-        border: 1px solid #10b98150;
-        border-radius: 20px;
-        padding: 28px 32px;
-        box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
-        margin-bottom: 28px;
+    /* Навигация сверху */
+    .top-nav {
         display: flex;
-        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        gap: 20px;
+        background: #ffffff;
+        padding: 14px 28px;
+        border-radius: 50px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
     }
 
-    .hero-title {
-        font-size: 32px;
+    .top-nav-logo {
+        font-size: 20px;
         font-weight: 800;
-        background: linear-gradient(90deg, #34d399, #60a5fa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0;
+        color: #166534;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .status-badge {
-        background: rgba(16, 185, 129, 0.1);
-        color: #34d399 !important;
-        border: 1px solid #10b98180;
-        padding: 8px 18px;
-        border-radius: 30px;
-        font-weight: 700 !important;
-        font-size: 14px;
+    .top-nav-badge {
+        background: #dcfce7;
+        color: #15803d;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
         letter-spacing: 0.5px;
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
     }
 
-    /* Стилизация карточек */
-    .glass-card {
-        background: #1e293b70;
-        backdrop-filter: blur(12px);
-        border: 1px solid #334155;
+    /* Hero Блок */
+    .hero-container {
+        background: linear-gradient(135deg, #15803d 0%, #166534 60%, #0f172a 100%);
+        border-radius: 24px;
+        padding: 48px 40px;
+        color: #ffffff;
+        box-shadow: 0 20px 40px rgba(22, 101, 52, 0.15);
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-big-title {
+        font-size: 64px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.05;
+        margin-bottom: 12px;
+        color: #ffffff;
+    }
+
+    .hero-sub {
+        font-size: 18px;
+        color: #bbf7d0;
+        font-weight: 500;
+        max-width: 650px;
+        line-height: 1.5;
+        margin-bottom: 28px;
+    }
+
+    /* Карточки-фишки в Hero */
+    .pill-container {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .pill-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 12px 20px;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    /* Белые секции под контент */
+    .section-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 32px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-desc {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    /* Результаты */
+    .metric-badge {
+        background: #f1f5f9;
         border-radius: 16px;
         padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        border: 2px solid #e2e8f0;
     }
 
-    /* Кастомная стилизация вкладок (Tabs) */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
-        background-color: #0f172a;
-        padding: 8px;
-        border-radius: 14px;
-        border: 1px solid #1e293b;
+    .metric-value {
+        font-size: 42px;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 8px 0;
     }
 
-    .stTabs [data-baseweb="tab"] {
-        height: 48px;
-        border-radius: 10px;
-        color: #94a3b8 !important;
+    /* Форматирование слайдеров */
+    .stSlider label, .stSelectbox label {
+        color: #334155 !important;
         font-weight: 600 !important;
-        background-color: transparent;
-        border: none !important;
-    }
-
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Загрузка модели
+# ---------------------------------------------------------
+# 3. Безопасная загрузка модели
+# ---------------------------------------------------------
 @st.cache_resource
-def load_model():
+def load_ml_model():
     try:
         return joblib.load("model.pkl")
-    except Exception as e:
+    except:
         return None
 
-model = load_model()
+model = load_ml_model()
 
-# 4. Шапка (Геро-Баннер)
+# ---------------------------------------------------------
+# 4. Верхнее меню
+# ---------------------------------------------------------
 st.markdown("""
-<div class="hero-header">
-    <div>
-        <div class="hero-title">🛡️ BioGuard AI Pro</div>
-        <p style="margin: 6px 0 0 0; color: #94a3b8 !important; font-weight: 400 !important; font-size: 15px;">
-            Интеллектуальная предиктивная система мониторинга биокоррозии нефтепромысловых объектов
-        </p>
+<div class="top-nav">
+    <div class="top-nav-logo">
+        🌿 BioGuard <span>| ИИ-Система</span>
     </div>
-    <div class="status-badge">
-        ● ИИ-ЯДРО АКТИВНО
+    <div style="display:flex; gap:20px; font-weight:600; color:#475569; font-size:14px;">
+        <span>01. Моделирование</span>
+        <span>02. Загрузка данных</span>
+        <span>03. Аналитика XAI</span>
+    </div>
+    <div class="top-nav-badge">
+        ● СИСТЕМА АКТИВНА
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 5. Вкладки
-tab1, tab2, tab3 = st.tabs([
-    "⚡ Экспресс-моделирование", 
-    "📊 Пакетный анализ файлов", 
-    "🧬 Вклад факторов (XAI)"
-])
+# ---------------------------------------------------------
+# 5. Главный Hero-Блок (Похоже на картинку NST)
+# ---------------------------------------------------------
+st.markdown("""
+<div class="hero-container">
+    <div style="text-transform: uppercase; font-weight: 700; letter-spacing: 2px; color: #86efac; font-size: 13px; margin-bottom: 8px;">
+        Экологическая безопасность & Защита инфраструктуры
+    </div>
+    <div class="hero-big-title">BioGuard AI</div>
+    <div class="hero-sub">
+        Прогнозирование бактериальной коррозии и износа металлоконструкций в нефтепромысловых средах с использованием нейросетевого анализа.
+    </div>
+    <div class="pill-container">
+        <div class="pill-card">🌐 <span>СВБ Мониторинг</span></div>
+        <div class="pill-card">⚡ <span>Экспресс-прогноз</span></div>
+        <div class="pill-card">♻️ <span>Защита экосистем</span></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-# ==========================================
-# ВКЛАДКА 1: Экспресс-моделирование
-# ==========================================
-with tab1:
-    col_input, col_result = st.columns([1.1, 0.9], gap="large")
+# ---------------------------------------------------------
+# 6. СЕКЦИЯ 1: Интерактивный калькулятор (Идет вниз по странице)
+# ---------------------------------------------------------
+st.markdown('<div class="section-card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📊 01. Экспресс-моделирование рисков</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Настройте параметры трубопровода и химического состава среды для мгновенного расчета уровня биокоррозии.</div>', unsafe_allow_html=True)
+
+col_inputs, col_outputs = st.columns([1.1, 0.9], gap="large")
+
+with col_inputs:
+    st.markdown("##### ⚙️ Параметры среды")
+    bact = st.slider("Бактериальная нагрузка (СВБ, клеток/мл)", 0, 1000, 350, step=10)
+    ph = st.slider("Уровень pH среды", 4.0, 9.0, 6.8, step=0.1)
+    temp = st.slider("Температура (°C)", 10, 90, 32, step=1)
+    flow = st.slider("Скорость потока (м/с)", 0.1, 5.0, 1.2, step=0.1)
+    salinity = st.slider("Минерализация / Соли (г/л)", 10, 300, 45, step=5)
+    h2s = st.slider("Содержание H₂S (мг/л)", 0, 100, 12, step=1)
+
+with col_outputs:
+    st.markdown("##### 🎯 Прогноз модели")
     
-    with col_input:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color:#f8fafc !important; margin-top:0;">⚙️ Параметры среды</h3>', unsafe_allow_html=True)
-        
-        bact = st.slider("Бактериальная нагрузка (СВБ, клеток/мл)", 0, 1000, 350, step=10)
-        ph = st.slider("Уровень pH среды", 4.0, 9.0, 6.8, step=0.1)
-        temp = st.slider("Температура (°C)", 10, 90, 32, step=1)
-        flow = st.slider("Скорость потока (м/с)", 0.1, 5.0, 1.2, step=0.1)
-        salinity = st.slider("Минерализация / Соли (г/л)", 10, 300, 45, step=5)
-        h2s = st.slider("Содержание H₂S (мг/л)", 0, 100, 12, step=1)
-        st.markdown('</div>', unsafe_allow_html=True)
+    # Расчет
+    pred = 0.0
+    if model is not None:
+        try:
+            df_in = pd.DataFrame([{'ph': ph, 'temperature': temp, 'flow_rate': flow, 'salinity': salinity, 'h2s': h2s, 'bacteria_count': bact}])
+            try:
+                pred = float(model.predict(df_in)[0])
+            except:
+                pred = float(model.predict(df_in.values)[0])
+        except:
+            pred = (bact * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
+    else:
+        pred = (bact * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
 
-    with col_result:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color:#f8fafc !important; margin-top:0;">🎯 Результат анализа</h3>', unsafe_allow_html=True)
-        
-        # Безопасный расчет
-        prediction = 0.0
+    pred = max(0.05, round(pred, 2))
+
+    # Статусы
+    if pred < 2.5:
+        risk_label = "НИЗКИЙ РИСК"
+        badge_bg = "#dcfce7"
+        badge_color = "#15803d"
+        border_col = "#22c55e"
+        recom_text = "Параметры среды находятся в безопасных пределах. Плановый контроль."
+    elif pred < 6.0:
+        risk_label = "СРЕДНИЙ РИСК"
+        badge_bg = "#fef3c7"
+        badge_color = "#b45309"
+        border_col = "#f59e0b"
+        recom_text = "Рекомендуется добавление бактерицида в нормированной дозе."
+    else:
+        risk_label = "КРИТИЧЕСКИЙ РИСК"
+        badge_bg = "#fee2e2"
+        badge_color = "#b91c1c"
+        border_col = "#ef4444"
+        recom_text = "ВНИМАНИЕ! Высокая скорость износа. Требуется немедленная обработка!"
+
+    st.markdown(f"""
+    <div style="background:#ffffff; border:2px solid {border_col}; border-radius:16px; padding:24px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Прогнозируемый износ стали</div>
+        <div style="font-size:48px; font-weight:800; color:#0f172a; margin:10px 0;">{pred} <span style="font-size:18px; color:#64748b;">мм/год</span></div>
+        <div style="background:{badge_bg}; color:{badge_color}; font-weight:800; display:inline-block; padding:6px 18px; border-radius:20px; font-size:13px;">
+            {risk_label}
+        </div>
+        <div style="margin-top:16px; font-size:13px; color:#475569; text-align:left; background:#f8fafc; padding:12px; border-radius:10px;">
+            💡 <b>Рекомендация:</b> {recom_text}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.write("")
+    
+    # График Plotly
+    bact_x = np.linspace(0, 1000, 30)
+    preds_y = []
+    for bx in bact_x:
         if model is not None:
             try:
-                # Подготовка данных с именами колонок (защита от AttributeError)
-                input_df = pd.DataFrame([{
-                    'ph': ph,
-                    'temperature': temp,
-                    'flow_rate': flow,
-                    'salinity': salinity,
-                    'h2s': h2s,
-                    'bacteria_count': bact
-                }])
-                
-                # Запасной вариант если модель обучена без названий
-                try:
-                    prediction = float(model.predict(input_df)[0])
-                except:
-                    prediction = float(model.predict(input_df.values)[0])
-            except Exception as e:
-                # Запасной алгоритм расчета если модель сбоит
-                prediction = (bact * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
-        else:
-            # Запасной математический расчет при отсутствии модели
-            prediction = (bact * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
+                df_t = pd.DataFrame([{'ph': ph, 'temperature': temp, 'flow_rate': flow, 'salinity': salinity, 'h2s': h2s, 'bacteria_count': bx}])
+                try: py = float(model.predict(df_t)[0])
+                except: py = float(model.predict(df_t.values)[0])
+            except: py = (bx * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
+        else: py = (bx * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
+        preds_y.append(max(0.05, py))
 
-        prediction = max(0.05, round(prediction, 2))
-
-        # Градация рисков
-        if prediction < 2.5:
-            risk_title = "НИЗКИЙ УРОВЕНЬ РИСКА"
-            color = "#10b981"
-            bg = "rgba(16, 185, 129, 0.1)"
-            recom = "Параметры среды находятся в безопасном диапазоне. Дополнительная химическая обработка не требуется."
-        elif prediction < 6.0:
-            risk_title = "СРЕДНИЙ УРОВЕНЬ РИСКА"
-            color = "#f59e0b"
-            bg = "rgba(245, 158, 11, 0.1)"
-            recom = "Рекомендуется плановый контроль концентрации бактерицида и мониторинг скорости коррозии."
-        else:
-            risk_title = "КРИТИЧЕСКИЙ РИСК БИОКОРРОЗИИ"
-            color = "#ef4444"
-            bg = "rgba(239, 68, 68, 0.1)"
-            recom = "ТРЕБУЕТСЯ АВАРИЙНОЕ ВМЕШАТЕЛЬСТВО: Подача повышенной дозы бактерицида и ингибитора коррозии!"
-
-        # Карточка вердикта
-        st.markdown(f"""
-        <div style="background:{bg}; border:2px solid {color}; border-radius:14px; padding:20px; text-align:center;">
-            <div style="font-size:12px; color:#94a3b8; font-weight:700; letter-spacing:1px;">ПРОГНОЗИРУЕМЫЙ ИЗНОС СТАЛИ</div>
-            <div style="font-size:46px; font-weight:900; color:#ffffff; margin:8px 0;">
-                {prediction} <span style="font-size:20px; color:#cbd5e1;">мм/год</span>
-            </div>
-            <div style="background:{color}; color:#ffffff !important; font-weight:800 !important; display:inline-block; padding:6px 16px; border-radius:20px; font-size:13px; letter-spacing:0.5px;">
-                {risk_title}
-            </div>
-            <div style="margin-top:14px; font-size:13px; color:#cbd5e1; text-align:left; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
-                💡 <b>Рекомендация:</b> {recom}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # График динамики
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<h4 style="color:#f8fafc !important; margin-top:0;">📈 Зависимость износа от бактерий</h4>', unsafe_allow_html=True)
-        
-        bact_range = np.linspace(0, 1000, 40)
-        
-        # Симуляция линии
-        preds_line = []
-        for b in bact_range:
-            if model is not None:
-                try:
-                    df_tmp = pd.DataFrame([{'ph': ph, 'temperature': temp, 'flow_rate': flow, 'salinity': salinity, 'h2s': h2s, 'bacteria_count': b}])
-                    try: p = float(model.predict(df_tmp)[0])
-                    except: p = float(model.predict(df_tmp.values)[0])
-                except:
-                    p = (b * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
-            else:
-                p = (b * 0.005) + (h2s * 0.03) + (salinity * 0.01) + ((7.0 - ph) * 0.4)
-            preds_line.append(max(0.05, p))
-
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=bact_range, 
-            y=preds_line,
-            mode='lines',
-            line=dict(color='#10b981', width=3),
-            fill='tozeroy',
-            fillcolor='rgba(16, 185, 129, 0.1)',
-            name='Износ'
-        ))
-
-        fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            margin=dict(l=10, r=10, t=10, b=10),
-            height=220,
-            font=dict(color="#94a3b8"),
-            xaxis=dict(showgrid=True, gridcolor='#334155', title='Бактерии (кл/мл)'),
-            yaxis=dict(showgrid=True, gridcolor='#334155', title='мм/год')
-        )
-        
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# ==========================================
-# ВКЛАДКА 2: Пакетный анализ
-# ==========================================
-with tab2:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<h3 style="color:#f8fafc !important; margin-top:0;">📁 Загрузка датасета (CSV)</h3>', unsafe_allow_html=True)
-    
-    uploaded_file = st.file_uploader("Перетащите файл сюда", type=["csv"])
-    if uploaded_file is not None:
-        try:
-            df = pd.read_csv(uploaded_file)
-            st.success("Файл успешно загружен!")
-            st.dataframe(df.head(10), use_container_width=True)
-        except Exception as e:
-            st.error(f"Ошибка загрузки: {e}")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ==========================================
-# ВКЛАДКА 3: Вклад факторов (XAI)
-# ==========================================
-with tab3:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<h3 style="color:#f8fafc !important; margin-top:0;">🧬 Влияние факторов на коррозию</h3>', unsafe_allow_html=True)
-    
-    factors = ['Бактерии (СВБ)', 'Сероводород (H₂S)', 'pH Среды', 'Минерализация', 'Температура', 'Скорость потока']
-    importance = [40, 25, 15, 10, 6, 4]
-    
-    fig_bar = px.bar(
-        x=importance, 
-        y=factors, 
-        orientation='h',
-        color=importance,
-        color_continuous_scale='Viridis'
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=bact_x, y=preds_y, mode='lines',
+        line=dict(color='#166534', width=3),
+        fill='tozeroy', fillcolor='rgba(22, 101, 52, 0.08)'
+    ))
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        height=180, margin=dict(l=10, r=10, t=10, b=10),
+        font=dict(color="#64748b"),
+        xaxis=dict(showgrid=True, gridcolor='#e2e8f0', title='Концентрация СВБ'),
+        yaxis=dict(showgrid=True, gridcolor='#e2e8f0', title='мм/год')
     )
-    fig_bar.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        height=300,
-        font=dict(color="#cbd5e1"),
-        xaxis=dict(showgrid=True, gridcolor='#334155', title='Вклад в %'),
-        yaxis=dict(title=''),
-        coloraxis_showscale=False
-    )
-    st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# 7. СЕКЦИЯ 2: Пакетная загрузка файлов (Скроллим дальше)
+# ---------------------------------------------------------
+st.markdown('<div class="section-card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📁 02. Пакетная обработка данных (CSV)</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Загрузите табличные данные замеров с нескольких скважин или участков для массового расчета.</div>', unsafe_allow_html=True)
+
+up_file = st.file_uploader("Выберите CSV файл", type=["csv"])
+if up_file is not None:
+    try:
+        data_df = pd.read_csv(up_file)
+        st.success("Данные загружены!")
+        st.dataframe(data_df.head(10), use_container_width=True)
+    except Exception as err:
+        st.error(f"Ошибка при чтении файла: {err}")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# 8. СЕКЦИЯ 3: Объяснимый ИИ (XAI)
+# ---------------------------------------------------------
+st.markdown('<div class="section-card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">🧬 03. Вклад факторов в биокоррозию</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-desc">Анализ важности признаков показывает, какие параметры сильнее всего ускоряют разрушение металла.</div>', unsafe_allow_html=True)
+
+feats = ['Бактерии (СВБ)', 'Сероводород (H₂S)', 'Уровень pH', 'Минерализация', 'Температура', 'Скорость потока']
+imp = [42, 24, 16, 9, 6, 3]
+
+fig_bar = px.bar(
+    x=imp, y=feats, orientation='h',
+    color=imp, color_continuous_scale=['#bbf7d0', '#166534']
+)
+fig_bar.update_layout(
+    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+    height=280, font=dict(color="#334155"),
+    xaxis=dict(showgrid=True, gridcolor='#e2e8f0', title='Влияние (%)'),
+    yaxis=dict(title=''), coloraxis_showscale=False
+)
+st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
+
+st.markdown('</div>', unsafe_allow_html=True)
